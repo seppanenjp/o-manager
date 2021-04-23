@@ -6,6 +6,15 @@ const EVERY_NIGHT = "0 0 * * *";
 const SUNDAY_NIGHT = "0 0 * * 0";
 export const initScheduler = (): void => {
   run(EVERY_5MIN, () => {}, "Updating results");
+
+  run(
+    EVERY_NIGHT,
+    () => {
+      // Clean runners which have been in database too long
+      // Create new runners so that database is "full"
+    },
+    "Updated runner database"
+  );
 };
 
 const run = (
