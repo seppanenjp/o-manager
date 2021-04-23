@@ -2,4 +2,4 @@
 
 | päivä | aika | mitä tein          |
 | :---: | :--- | :----------------- |
-| 23.4. | x    | Projektin konffausta |
+| 23.4. | 4    | Projektin konffausta |
