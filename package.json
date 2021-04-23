@@ -41,6 +41,7 @@
     "compression": "^1.7.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "nimet": "^0.0.4",
     "node-cron": "^3.0.0",
     "passport": "^0.4.1",
     "passport-facebook-token": "^4.0.0",

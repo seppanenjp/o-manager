@@ -9,6 +9,7 @@ import { Express } from "express";
 import { routes } from "./routes";
 import { initScheduler } from "./cron";
 import { Server } from "http";
+import { initRunner } from "./models/runner";
 
 export const app: Express = express();
 
@@ -23,6 +24,8 @@ initScheduler();
 app.use(compression());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use("/api", routes);
+
+console.log(initRunner());
 
 // setup passport for Facebook
 /*passport.use(
