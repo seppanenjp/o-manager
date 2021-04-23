@@ -1,2 +1,2 @@
-# o-manager
-Orienteering Manager
+# O-manager
+Orienteering Manager Game
