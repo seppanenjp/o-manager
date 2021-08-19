@@ -2,12 +2,13 @@ import * as express from "express";
 import { Express } from "express";
 import * as compression from "compression";
 import * as bodyParser from "body-parser";
-import * as mongoose from "mongoose";
 import { routes } from "./routes";
 import { initScheduler } from "./cron";
 import { config } from "dotenv";
 import { Server } from "http";
 import { Gender, initRunner, Runner, totalSkill } from "./entity/runner";
+import { createConnection } from "typeorm";
+import { connectionOptions } from "./config/database";
 
 config();
 
@@ -34,16 +35,9 @@ runners.map((runner: Runner) => {
   console.log(runner.firstName, runner.lastName, totalSkill(runner));
 });
 
-/*mongoose
-  .connect(
-    `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@o-manager-dev.iuuln.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`,
-    {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    }
-  )
+createConnection(connectionOptions)
   .then(() => app.use("/api", routes))
-  .catch(() => console.log("Unable to connect database"));*/
+  .catch(() => console.log("Unable to connect database"));
 
 // setup passport for Facebook
 /*passport.use(

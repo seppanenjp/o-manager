@@ -1,5 +1,6 @@
 import { randomNumber } from "../utils/random";
 import { femaleName, maleName } from "../utils/name-generator";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Gender {
   Male = "Male",
@@ -19,11 +20,25 @@ export enum RunnerMood {
   Unmotivated = "Unmotivated",
 }
 
+@Entity({ name: "Runner", schema: "o-manager" })
 export class Runner {
+  @PrimaryGeneratedColumn("uuid")
   id: string;
+
+  @Column({ type: "string" })
   firstName: string;
+
+  @Column({ type: "string" })
   lastName: string;
+
+  @Column({
+    type: "enum",
+    enum: [Gender.Male, Gender.Female],
+    default: Gender.Male,
+  })
   gender: Gender;
+
+  @Column({ type: "simple-json" })
   skills: {
     runningSpeed: number;
     stressTolerance: number;
@@ -32,10 +47,34 @@ export class Runner {
     endurance: number;
     compassUsage: number;
   };
+
+  @Column({ type: "number" })
   age: number;
+
+  @Column({
+    type: "enum",
+    enum: [
+      RunnerStatus.Active,
+      RunnerStatus.Sick,
+      RunnerStatus.Injured,
+      RunnerStatus.Retired,
+    ],
+    default: RunnerStatus.Active,
+  })
   status: RunnerStatus;
+
+  // TODO: Link team with relation?
+  @Column({ type: "string", nullable: true })
   team?: string;
+
+  @Column({
+    type: "enum",
+    enum: [RunnerMood.Normal, RunnerMood.Motivated, RunnerMood.Unmotivated],
+    default: RunnerMood.Motivated,
+  })
   mood: RunnerMood;
+
+  @Column({ type: "number", default: () => 0 })
   rankingPoints: number;
 }
 
