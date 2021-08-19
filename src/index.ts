@@ -1,17 +1,13 @@
 import * as express from "express";
+import { Express } from "express";
 import * as compression from "compression";
 import * as bodyParser from "body-parser";
-import * as passport from "passport";
-import * as FacebookTokenStrategy from "passport-facebook-token";
-import * as GoogleTokenStrategy from "passport-google-token";
 import * as mongoose from "mongoose";
-
-import { Express } from "express";
 import { routes } from "./routes";
 import { initScheduler } from "./cron";
 import { config } from "dotenv";
 import { Server } from "http";
-import { initRunner } from "./models/runner";
+import { Gender, initRunner, Runner, totalSkill } from "./entity/runner";
 
 config();
 
@@ -28,9 +24,17 @@ initScheduler();
 app.use(compression());
 app.use(bodyParser.json({ limit: "50mb" }));
 
-console.log(initRunner());
+let amount = 200;
+const runners = [];
+while (amount--) {
+  runners.push(initRunner({ gender: Gender.Male }));
+}
 
-mongoose
+runners.map((runner: Runner) => {
+  console.log(runner.firstName, runner.lastName, totalSkill(runner));
+});
+
+/*mongoose
   .connect(
     `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@o-manager-dev.iuuln.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`,
     {
@@ -39,7 +43,7 @@ mongoose
     }
   )
   .then(() => app.use("/api", routes))
-  .catch(() => console.log("Unable to connect database"));
+  .catch(() => console.log("Unable to connect database"));*/
 
 // setup passport for Facebook
 /*passport.use(

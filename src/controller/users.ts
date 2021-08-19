@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { dispatch } from "../models/response";
 import { UserService } from "../service/users";
 
-const usersRouter = Router();
+export const usersRouter = Router();
 const userService = new UserService();
 
 /*
