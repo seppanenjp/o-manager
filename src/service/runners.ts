@@ -1,11 +1,19 @@
+import { HttpErrorResponse, HttpResponse } from "../models/response";
+import { Runner } from "../entity/runner";
+import { randomBoolean } from "../utils/random";
+
 export class RunnerService {
-  updateRunner(): void {}
+  /*  getRunner(
+    runnerId: string
+  ): Promise<HttpErrorResponse<Runner> | HttpErrorResponse> {}
 
-  getRunners(): void {}
+  updateRunner(): void {}*/
 
-  getClubRunners(): void {}
+  /* getRunners(): Promise<HttpResponse<Runner[]> | HttpErrorResponse> {}
 
-  getFreeRunners(): void {}
+  getClubRunners(): Promise<HttpErrorResponse<Runner[]> | HttpErrorResponse> {}
+
+  getFreeRunners(): Promise<HttpErrorResponse<Runner[]> | HttpErrorResponse> {}*/
 
   inactivateRunner(): void {}
 }

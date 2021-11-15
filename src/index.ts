@@ -6,7 +6,7 @@ import { routes } from "./routes";
 import { initScheduler } from "./cron";
 import { config } from "dotenv";
 import { Server } from "http";
-import { Gender, initRunner, Runner, totalSkill } from "./entity/runner";
+import { initRunner, Runner, totalSkill } from "./entity/runner";
 import { createConnection } from "typeorm";
 import { connectionOptions } from "./config/database";
 
@@ -28,12 +28,10 @@ app.use(bodyParser.json({ limit: "50mb" }));
 let amount = 200;
 const runners = [];
 while (amount--) {
-  runners.push(initRunner({ gender: Gender.Male }));
+  runners.push(initRunner());
 }
 
-runners.map((runner: Runner) => {
-  console.log(runner.firstName, runner.lastName, totalSkill(runner));
-});
+runners.map(console.log);
 
 createConnection(connectionOptions)
   .then(() => app.use("/api", routes))

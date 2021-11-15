@@ -1,4 +1,4 @@
-import { randomNumber } from "../utils/random";
+import { randomBoolean, randomNumber } from "../utils/random";
 import { femaleName, maleName } from "../utils/name-generator";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
@@ -11,7 +11,6 @@ export enum RunnerStatus {
   Active = "Active",
   Retired = "Retired",
   Injured = "Injured",
-  Sick = "Sick",
 }
 
 export enum RunnerMood {
@@ -53,19 +52,14 @@ export class Runner {
 
   @Column({
     type: "enum",
-    enum: [
-      RunnerStatus.Active,
-      RunnerStatus.Sick,
-      RunnerStatus.Injured,
-      RunnerStatus.Retired,
-    ],
+    enum: [RunnerStatus.Active, RunnerStatus.Injured, RunnerStatus.Retired],
     default: RunnerStatus.Active,
   })
   status: RunnerStatus;
 
-  // TODO: Link team with relation?
+  // TODO: Link team with relation
   @Column({ type: "string", nullable: true })
-  team?: string;
+  teamId?: string;
 
   @Column({
     type: "enum",
@@ -78,34 +72,34 @@ export class Runner {
   rankingPoints: number;
 }
 
-export const initRunner = (
-  options: { gender?: Gender; age?: number } = {
-    gender: Gender.Male,
-    age: randomNumber({ min: 18, max: 50 }),
-  }
-): Runner => ({
-  id: "",
-  gender: options.gender,
-  ...(options.gender === Gender.Male ? maleName() : femaleName()),
-  skills: {
-    dayOrienteering: randomNumber({ min: 15, max: 100 }),
-    nightOrienteering: randomNumber({ min: 15, max: 100 }),
-    runningSpeed: randomNumber({
-      min: 50,
-      max: 100 - Math.round(options.age / 3),
-    }),
-    stressTolerance: randomNumber({
-      min: Math.round(options.age / 2),
-      max: 100,
-    }),
-    endurance: randomNumber({ min: 30, max: 100 }),
-    compassUsage: randomNumber({ min: 10, max: 100 }),
-  },
-  age: options.age,
-  status: RunnerStatus.Active,
-  rankingPoints: 0,
-  mood: RunnerMood.Normal, // TODO: Random
-});
+export const initRunner = (): Runner => {
+  const age = randomNumber({ min: 18, max: 50 });
+  const gender = randomBoolean(50) ? Gender.Male : Gender.Female;
+  const mood = randomMood();
+  return {
+    id: "",
+    gender,
+    ...(gender === Gender.Male ? maleName() : femaleName()),
+    skills: {
+      dayOrienteering: randomNumber({ min: 15, max: 100 }),
+      nightOrienteering: randomNumber({ min: 15, max: 100 }),
+      runningSpeed: randomNumber({
+        min: 50,
+        max: 100 - Math.round(age / 3),
+      }),
+      stressTolerance: randomNumber({
+        min: Math.round(age / 2),
+        max: 100,
+      }),
+      endurance: randomNumber({ min: 30, max: 100 }),
+      compassUsage: randomNumber({ min: 10, max: 100 }),
+    },
+    age,
+    status: randomStatus(mood === RunnerMood.Unmotivated ? 35 : 5),
+    rankingPoints: 0,
+    mood,
+  };
+};
 
 export const totalSkill = (runner: Runner): number =>
   Number(
@@ -114,3 +108,18 @@ export const totalSkill = (runner: Runner): number =>
       Object.values(runner.skills).length
     ).toFixed(0)
   );
+
+export const randomStatus = (percentage: number): RunnerStatus => {
+  return randomBoolean(percentage) ? RunnerStatus.Injured : RunnerStatus.Active;
+};
+
+export const randomMood = (): RunnerMood => {
+  const value = randomNumber({ max: 100 });
+  if (value >= 85) {
+    return RunnerMood.Motivated;
+  } else if (value >= 20) {
+    return RunnerMood.Normal;
+  } else {
+    return RunnerMood.Unmotivated;
+  }
+};
