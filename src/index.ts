@@ -6,7 +6,7 @@ import { routes } from "./routes";
 import { initScheduler } from "./cron";
 import { config } from "dotenv";
 import { Server } from "http";
-import { initRunner, Runner, totalSkill } from "./entity/runner";
+import { initRunner, Runner, totalSkill, updateRunner } from "./entity/runner";
 import { createConnection } from "typeorm";
 import { connectionOptions } from "./config/database";
 
@@ -25,13 +25,13 @@ initScheduler();
 app.use(compression());
 app.use(bodyParser.json({ limit: "50mb" }));
 
-let amount = 200;
-const runners = [];
-while (amount--) {
-  runners.push(initRunner());
-}
+let runner = initRunner();
+console.log("runner", runner);
 
-runners.map(console.log);
+setInterval(() => {
+  runner = updateRunner(runner);
+  console.log("updated", runner);
+}, 5000);
 
 createConnection(connectionOptions)
   .then(() => app.use("/api", routes))

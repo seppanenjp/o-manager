@@ -109,15 +109,12 @@ export const initRunner = (): Runner => {
 };
 
 export const updateRunner = (runner: Runner): Runner => {
+  const age = runner.age + 1;
   const skills = {
     ...runner.skills,
-    runningSpeed: randomNumber({
-      min: runner.skills.runningSpeed - (runner.age > 35 ? 10 : 3),
-      max:
-        runner.age > 35
-          ? runner.skills.runningSpeed
-          : runner.skills.runningSpeed + 3,
-    }),
+    runningSpeed: randomNumber(
+      updatedRunningSpeedLimits(age, runner.skills.runningSpeed)
+    ),
     stressTolerance: randomNumber({
       min: runner.skills.stressTolerance - 3,
       max: runner.skills.stressTolerance + 3,
@@ -128,12 +125,34 @@ export const updateRunner = (runner: Runner): Runner => {
 
   return {
     ...runner,
-    age: runner.age++,
+    age,
     skills,
-    totalSkill: totalSkill(skills),
     mood,
-    status: randomStatus(mood === RunnerMood.Unmotivated ? 35 : 5),
+    totalSkill: totalSkill(skills),
+    status:
+      runner.skills.runningSpeed < 20
+        ? RunnerStatus.Retired
+        : randomStatus(mood === RunnerMood.Unmotivated ? 35 : 5),
   };
+};
+
+export const updatedRunningSpeedLimits = (
+  age: number,
+  currentRunningSpeed: number
+): { min: number; max: number } => {
+  if (age >= 70) {
+    return { max: currentRunningSpeed, min: currentRunningSpeed - 8 };
+  }
+  if (age >= 60) {
+    return { max: currentRunningSpeed, min: currentRunningSpeed - 6 };
+  }
+  if (age >= 50) {
+    return { max: currentRunningSpeed, min: currentRunningSpeed - 4 };
+  }
+  if (age >= 35) {
+    return { max: currentRunningSpeed + 1, min: currentRunningSpeed - 2 };
+  }
+  return { max: currentRunningSpeed + 3, min: currentRunningSpeed - 1 };
 };
 
 export const totalSkill = (skills: Skills): number =>
