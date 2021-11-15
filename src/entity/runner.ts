@@ -19,6 +19,15 @@ export enum RunnerMood {
   Unmotivated = "Unmotivated",
 }
 
+export interface Skills {
+  runningSpeed: number;
+  stressTolerance: number;
+  dayOrienteering: number;
+  nightOrienteering: number;
+  endurance: number;
+  compassUsage: number;
+}
+
 @Entity({ name: "Runner", schema: "o-manager" })
 export class Runner {
   @PrimaryGeneratedColumn("uuid")
@@ -38,14 +47,10 @@ export class Runner {
   gender: Gender;
 
   @Column({ type: "simple-json" })
-  skills: {
-    runningSpeed: number;
-    stressTolerance: number;
-    dayOrienteering: number;
-    nightOrienteering: number;
-    endurance: number;
-    compassUsage: number;
-  };
+  skills: Skills;
+
+  @Column({ type: "number" })
+  totalSkill: number;
 
   @Column({ type: "number" })
   age: number;
@@ -76,24 +81,26 @@ export const initRunner = (): Runner => {
   const age = randomNumber({ min: 18, max: 50 });
   const gender = randomBoolean(50) ? Gender.Male : Gender.Female;
   const mood = randomMood();
+  const skills = {
+    dayOrienteering: randomNumber({ min: 15, max: 100 }),
+    nightOrienteering: randomNumber({ min: 15, max: 100 }),
+    runningSpeed: randomNumber({
+      min: 50,
+      max: 100 - Math.round(age / 3),
+    }),
+    stressTolerance: randomNumber({
+      min: Math.round(age / 2),
+      max: 100,
+    }),
+    endurance: randomNumber({ min: 30, max: 100 }),
+    compassUsage: randomNumber({ min: 10, max: 100 }),
+  };
   return {
     id: "",
     gender,
     ...(gender === Gender.Male ? maleName() : femaleName()),
-    skills: {
-      dayOrienteering: randomNumber({ min: 15, max: 100 }),
-      nightOrienteering: randomNumber({ min: 15, max: 100 }),
-      runningSpeed: randomNumber({
-        min: 50,
-        max: 100 - Math.round(age / 3),
-      }),
-      stressTolerance: randomNumber({
-        min: Math.round(age / 2),
-        max: 100,
-      }),
-      endurance: randomNumber({ min: 30, max: 100 }),
-      compassUsage: randomNumber({ min: 10, max: 100 }),
-    },
+    skills,
+    totalSkill: totalSkill(skills),
     age,
     status: randomStatus(mood === RunnerMood.Unmotivated ? 35 : 5),
     rankingPoints: 0,
@@ -101,11 +108,39 @@ export const initRunner = (): Runner => {
   };
 };
 
-export const totalSkill = (runner: Runner): number =>
+export const updateRunner = (runner: Runner): Runner => {
+  const skills = {
+    ...runner.skills,
+    runningSpeed: randomNumber({
+      min: runner.skills.runningSpeed - (runner.age > 35 ? 10 : 3),
+      max:
+        runner.age > 35
+          ? runner.skills.runningSpeed
+          : runner.skills.runningSpeed + 3,
+    }),
+    stressTolerance: randomNumber({
+      min: runner.skills.stressTolerance - 3,
+      max: runner.skills.stressTolerance + 3,
+    }),
+  };
+
+  const mood = randomMood();
+
+  return {
+    ...runner,
+    age: runner.age++,
+    skills,
+    totalSkill: totalSkill(skills),
+    mood,
+    status: randomStatus(mood === RunnerMood.Unmotivated ? 35 : 5),
+  };
+};
+
+export const totalSkill = (skills: Skills): number =>
   Number(
     (
-      Object.values(runner.skills).reduce((a, b) => a + b, 0) /
-      Object.values(runner.skills).length
+      Object.values(skills).reduce((a, b) => a + b, 0) /
+      Object.values(skills).length
     ).toFixed(0)
   );
 
